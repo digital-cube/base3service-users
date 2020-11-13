@@ -11,7 +11,8 @@ in postgresql create database user demo, and using this user create databases de
 
 perform following steps to run integration tests
 
-```python3 -m venv .venv
+```
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
