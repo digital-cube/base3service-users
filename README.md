@@ -1,4 +1,4 @@
-# base3-demo-contacts
+# base3service-users
 
 requirements:
   - python3
