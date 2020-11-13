@@ -1,0 +1,70 @@
+name: 'users'
+description: 'base3 application'
+prefix: '/api/users'
+app_version: '0.0.1'
+host: 'users'
+port: &port 80
+
+apptype: 'micro-service'
+
+store:
+  type: 'redis'
+  host: 'redis'
+  port: '6379'
+
+
+db:
+  type: 'postgres'
+  port: 5432
+  host: 'postgres'
+  username: 'demo'
+  password: 'demo'
+  database: 'users'
+
+authorization:
+  key: 'Authorization'
+
+logging:
+  version: 1
+  request_logger: base
+  formatters:
+    brief:
+      format: '%(asctime)s %(name)s %(levelname)s : %(message)s'
+    detailed:
+      format: 'time="%(asctime)s" logger="%(name)s" level="%(levelname)s" %(message)s'
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: CRITICAL
+      formatter: brief
+      stream: ext://sys.stdout
+    file:
+      class : logging.handlers.RotatingFileHandler
+      level: DEBUG
+      formatter: detailed
+      filename: /tmp/base_app.log
+      backupCount: 3
+  loggers:
+    base:
+      level: DEBUG
+      handlers:
+        - console
+        - file
+      propagate: no
+    tornado.access:
+      level: DEBUG
+      handlers:
+        - file
+    tornado.application:
+      level: DEBUG
+      handlers:
+        - file
+    tornado.general:
+      level: DEBUG
+      handlers:
+        - file
+  root:
+    level: WARNING
+    handlers:
+      - console
+  

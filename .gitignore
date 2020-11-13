@@ -1,0 +1,6 @@
+.venv
+.idea
+*~
+*.pyc
+keys/jwt.private_key
+keys/jwt.public_key
