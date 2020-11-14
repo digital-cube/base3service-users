@@ -12,13 +12,12 @@ current_file_folder = os.path.dirname(os.path.realpath(__file__))
 
 class SetUpTestUserServiceBase(test.BaseTest):
 
-    def prefix(self):
-        return '/api/users'
-
     def setUp(self):
         from base import registry, orm, app, config
         config.load_from_yaml(os.path.dirname(os.path.realpath(__file__)) + f'/../config/config.{os.getenv("ENVIRONMENT", "local")}.yaml')
         config.conf['db']['database'] = f"test_{config.conf['db']['database']}"
+
+        self.prefix = config.conf['prefix']
 
         importlib.import_module('orm.models')
         registry.test = True
