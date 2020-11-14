@@ -9,6 +9,12 @@ import jwt
 from base import orm
 from base import common
 
+# Telmekom
+
+from sqlalchemy import Text
+from sqlalchemy.dialects.postgresql import JSONB
+
+# /Telmekom
 
 class User(orm.BaseSql, orm.sql_base):
     __tablename__ = 'users'
@@ -25,6 +31,17 @@ class User(orm.BaseSql, orm.sql_base):
     last_name = Column(String)
 
     permission_flags = Column(Integer, nullable=False, default=1)
+
+    # Telmekom
+    org_unit = Column(String(64))
+    data = Column(JSONB(astext_type=Text()))
+    profile_picture = Column(String(64))
+    id_ombis = Column(Integer, nullable=True)
+
+    def displayname(self):
+        return self.username
+
+    # /Telmekom
 
     def serialize(self, keys: list = ['id', 'username', 'email', 'permission_flags', 'first_name', 'last_name']):
         return super().serialize(keys, forbidden=['password'])
@@ -72,4 +89,3 @@ class ForgotPasswordId(orm.BaseSql, orm.sql_base):
     user = relationship(User, uselist=False, foreign_keys=[id_user])
 
     expired = Column(DateTime, nullable=True, default=None, index=True)
-

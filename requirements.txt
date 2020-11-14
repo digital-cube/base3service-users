@@ -1,2 +1,4 @@
 wheel
 base3
+mysql-connector-python
+mysqlclient
