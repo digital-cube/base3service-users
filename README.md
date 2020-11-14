@@ -16,7 +16,8 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-cd config.local.yaml.sample config.local.yaml
+cd config
+cp config.local.yaml.sample config.local.yaml
 cp config.docker.yaml.sample config.docker.yaml
 
 
