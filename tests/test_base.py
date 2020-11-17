@@ -18,7 +18,7 @@ class SetUpTestUserServiceBase(test.BaseTest):
         config.load_from_yaml(os.path.dirname(os.path.realpath(__file__)) + f'/../config/config.{os.getenv("ENVIRONMENT", "local")}.yaml')
         config.conf['db']['database'] = f"test_{config.conf['db']['database']}"
 
-        print(config.conf['mysql'])
+        # print(config.conf['mysql'])
 
         self.prefix = config.conf['prefix']
 
