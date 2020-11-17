@@ -4,4 +4,3 @@
 *.pyc
 keys/jwt.private_key
 keys/jwt.public_key
-config/*.yaml
