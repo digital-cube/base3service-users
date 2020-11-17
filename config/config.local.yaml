@@ -16,9 +16,9 @@ db:
   type: 'postgres'
   port: 5432
   host: 'localhost'
-  username: 'demo'
-  password: 'demo'
-  database: 'demo_users'
+  username: 'telmekom'
+  password: '123'
+  database: 'opensync_users'
 
 authorization:
   key: 'Authorization'

@@ -17,8 +17,8 @@ db:
   type: 'postgres'
   port: 5432
   host: 'postgres'
-  username: 'demo'
-  password: 'demo'
+  username: 'telmekom'
+  password: '123'
   database: 'users'
 
 authorization:
