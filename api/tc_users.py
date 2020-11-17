@@ -337,3 +337,18 @@ class CheckToken(base.Base):
     @base.api()
     async def get(self):
         return None
+
+def create_new_user_session(orm_session, username, password):
+    user = orm_session.query(models.User).filter(models.User.username == username,
+                                                 models.User.password == password).one_or_none()
+    if not user:
+        raise http.HttpErrorUnauthorized
+
+    token = models.Session(user)
+    orm_session.add(token)
+    orm_session.commit()
+
+    import base
+    base.store.set(token.id,'1')
+
+    return {'id': user.id, 'token': token.jwt}, http.status.CREATED

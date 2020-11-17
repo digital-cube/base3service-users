@@ -74,12 +74,24 @@ class Session(orm.BaseSql, orm.sql_base):
             'permissions': self.user.permission_flags
         }
 
+        print('b1')
         from base import registry
+        print('b2')
+
+        print(registry.public_key())
+        print('b22')
+
+        pk = registry.private_key()
+
+        print('pk',pk)
+        print('b23')
 
         encoded = jwt.encode(payload, registry.private_key(), algorithm='RS256')
+        print('b3')
 
         # this attribute will not be saved to DB
         self.jwt = encoded.decode('ascii')
+        print('b4')
 
 
 class ForgotPasswordId(orm.BaseSql, orm.sql_base):

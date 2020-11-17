@@ -24,10 +24,10 @@ mysql:
 
 db:
   type: 'postgres'
-  port: 5432
-  host: 'postgres'
-  username: 'telmekom'
-  password: '123'
+  port: $POSTGRES_PORT
+  host: $POSTGRES_HOST
+  username: $POSTGRES_USER
+  password: $POSTGRES_PASSWORD
   database: 'tc_users'
 
 authorization:

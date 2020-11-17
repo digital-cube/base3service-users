@@ -10,6 +10,7 @@ if __name__ == "__main__":
     base.config.load_private_key(my_dir_name + '/keys/jwt.private_key')
 
     importlib.import_module('api.users')
+    importlib.import_module('api.tc_users')
     importlib.import_module('lookup.user_permissions')
 
     from base import store
@@ -17,7 +18,11 @@ if __name__ == "__main__":
     with open(my_dir_name + '/keys/jwt.public_key') as pubkey:
         store.set('users_service_public_key', pubkey.read())
 
-    # with open(my_dir_name + '/keys/jwt.private_key') as pkey:
-    #     store.set('users_service_private_key', pkey.read())
+    with open(my_dir_name + '/keys/jwt.private_key') as pkey:
+        pk = pkey.read()
+
+        store.set('users_service_private_key', pk)
+        print("okey",pkey.read())
+
 
     base.run(debug=True)
