@@ -1,0 +1,79 @@
+name: 'users'
+description: 'base3 application'
+prefix: '/tcapi/users'
+app_version: '0.0.1'
+host: 'users'
+port: &port 80
+
+
+apptype: 'micro-service'
+
+store:
+  type: 'redis'
+  host: 'redis'
+  port: '6379'
+
+mysql:
+  db_host: $MYSQL_DBHOST
+  db_name: $MYSQL_DBNAME
+  db_user: $MYSQL_DBUSER
+  db_password: $MYSQL_DBPASSWORD
+  db_port: "3306"
+  db_type: "mysql"
+  db_charset: "utf8"
+
+db:
+  type: 'postgres'
+  port: 5432
+  host: 'postgres'
+  username: 'telmekom'
+  password: '123'
+  database: 'tc_users'
+
+authorization:
+  key: 'jwt'
+
+logging:
+  version: 1
+  request_logger: base
+  formatters:
+    brief:
+      format: '%(asctime)s %(name)s %(levelname)s : %(message)s'
+    detailed:
+      format: 'time="%(asctime)s" logger="%(name)s" level="%(levelname)s" %(message)s'
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: CRITICAL
+      formatter: brief
+      stream: ext://sys.stdout
+    file:
+      class : logging.handlers.RotatingFileHandler
+      level: DEBUG
+      formatter: detailed
+      filename: /tmp/base_app.log
+      backupCount: 3
+  loggers:
+    base:
+      level: DEBUG
+      handlers:
+        - console
+        - file
+      propagate: no
+    tornado.access:
+      level: DEBUG
+      handlers:
+        - file
+    tornado.application:
+      level: DEBUG
+      handlers:
+        - file
+    tornado.general:
+      level: DEBUG
+      handlers:
+        - file
+  root:
+    level: WARNING
+    handlers:
+      - console
+  
