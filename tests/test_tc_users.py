@@ -27,6 +27,7 @@ class TestInfo(SetuUpTestUsersWithRegisteredAdmin):
     def test_fetch_user(self):
 
         self.id_igor, self.token_igor = self.register_and_login('igor', THE_PASSWORD, perm.USER)
-
         self.api(None, 'GET', f'/tcapi/users/admin/{self.id_igor}', expected_code=http.status.UNAUTHORIZED)
-        self.api(self.token_admin, 'GET', f'/tcapi/users/{self.id_igor}', expected_code=http.status.OK)
+        self.api(self.token_admin, 'GET', f'/tcapi/users/{self.id_igor}') #, expected_code=http.status.OK)
+
+        self.show_last_result()

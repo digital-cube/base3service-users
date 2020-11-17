@@ -206,7 +206,11 @@ class UsersHandler(base.Base):
         allow_password(user, user.password)
 
         user.password = encrypt_password(user)
-        self.orm_session.add(user)
+        try:
+            self.orm_session.add(user)
+        except Exception as e:
+            print(e)
+            raise
 
         try:
             self.orm_session.commit()

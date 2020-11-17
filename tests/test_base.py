@@ -45,6 +45,9 @@ class SetUpTestUserServiceBase(test.BaseTest):
         super().setUp()
         registry.test_port = self.get_http_port()
 
+        # import base
+        # base.route.print_all_routes()
+
     def register_and_login(self, username, password, permission_flags):
         self.api(None, 'POST', self.prefix + '/',
                  body={'user': {'username': username,
