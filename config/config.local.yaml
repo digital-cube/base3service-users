@@ -21,6 +21,12 @@ mysql:
   db_type: "mysql"
   db_charset: "utf8"
 
+ombis:
+  host: "10.81.16.45"
+  user: "WebService"
+  password: "Omb!Rest#"
+  port: "8070"
+
 db:
   type: 'postgres'
   port: 5432

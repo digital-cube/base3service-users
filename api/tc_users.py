@@ -108,7 +108,7 @@ class OmbisUsersSyncHandler(base.Base):
 
     @base.api()
     async def post(self, ombis_id_users: str = 'all'):
-        ocfg = base.registry.service('tickets')['ombis']
+        ocfg = base.registry.service('users')['ombis']
 
         filter = '?'
         if ombis_id_users != 'all':
