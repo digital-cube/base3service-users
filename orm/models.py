@@ -43,7 +43,7 @@ class User(orm.BaseSql, orm.sql_base):
 
     # /Telmekom
 
-    def serialize(self, keys: list = ['id', 'username', 'email', 'permission_flags', 'first_name', 'last_name']):
+    def serialize(self, keys: list = ['id', 'username', 'email', 'permission_flags', 'first_name', 'last_name', 'org_unit']):
         return super().serialize(keys, forbidden=['password'])
 
 

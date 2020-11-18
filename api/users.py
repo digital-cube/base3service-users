@@ -224,9 +224,21 @@ class UsersHandler(base.Base):
 
     @base.auth()
     @base.api()
-    async def get(self):
-        logged_user = self.orm_session.query(models.User).filter(models.User.id == self.id_user).one_or_none()
-        return logged_user.serialize()
+#    async def get(self):
+#        logged_user = self.orm_session.query(models.User).filter(models.User.id == self.id_user).one_or_none()
+#        return logged_user.serialize()
+
+    async def get(self, list: bool = True, key: str = 'id'):
+        if list:
+            all_users = [
+                u.serialize() for u in self.orm_session.query(models.User)
+            ]
+        else:
+            all_users = {
+                getattr(u, key): u.serialize() for u in self.orm_session.query(models.User)
+            }
+
+        return all_users
 
     @base.auth()
     @base.api()

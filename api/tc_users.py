@@ -32,6 +32,7 @@ class UserHandlerByUnits(base.Base):
     @base.auth()
     @base.api()
     async def get(self):
+        print('bou1')
         res = {}
 
         for u in self.orm_session.query(models.User).order_by(models.User.first_name,
@@ -47,15 +48,18 @@ class UserHandlerByUnits(base.Base):
         org_units = [x for x in org_units if x]
         org_units.sort()
 
+        print('bou2')
         sorted = [x for x in org_units if x not in ('Other', None)]
 
         if len(sorted) != len(org_units):
             sorted.append('Other')
 
         rrr = {}
+        print('bou3')
         for ou in sorted:
             rrr[ou] = res[ou]
 
+        print('rrr')
         return rrr
 
 
@@ -76,7 +80,22 @@ class AllUserHandler(base.Base):
 
         raise http.HttpInvalidParam({"message": f"invalid mapped by parameter {mapped_by}"})
 
+'''
+@base.route("/-all-")
+class All2UserHandler(base.Base):
 
+    async def get(self, list: bool = True, key: str = 'id'):
+        if list:
+            all_users = [
+                u.serialize() for u in self.orm_session.query(models.User)
+            ]
+        else:
+            all_users = {
+                getattr(u, key): u.serialize() for u in self.orm_session.query(models.User)
+            }
+
+        return all_users
+'''
 
 @base.route(URI="/all-with-details-mapped-by-ombis")
 class AllDetailsUserHandler(base.Base):
