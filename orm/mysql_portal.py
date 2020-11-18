@@ -55,10 +55,6 @@ def activate_orm():
 
 
     from base import config
-
-    # config.load_from_yaml(
-    #     os.path.dirname(os.path.realpath(__file__)) + f'/../config/config.{os.getenv("ENVIRONMENT", "local")}.yaml')
-
     cfg = config.conf['mysql']
 
     _db_url = make_database_url(cfg['db_type'], cfg['db_name'], cfg['db_host'], cfg['db_port'],
