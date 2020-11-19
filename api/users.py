@@ -206,7 +206,12 @@ class UsersHandler(base.Base):
         allow_password(user, user.password)
 
         user.password = encrypt_password(user)
-        self.orm_session.add(user)
+
+        try:
+            self.orm_session.add(user)
+        except Exception as e:
+            print(e)
+
 
         try:
             self.orm_session.commit()
@@ -245,7 +250,10 @@ class SessionsHandler(base.Base):
         if not check_password(user, password):
             raise base.http.HttpErrorUnauthorized
 
-        session = models.Session(user)
+        try:
+            session = models.Session(user)
+        except Exception as e:
+            print(e)
         self.orm_session.add(session)
         self.orm_session.commit()
 
