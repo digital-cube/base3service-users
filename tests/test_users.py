@@ -81,15 +81,15 @@ class TestUsersWithRegisteredAdmin(SetuUpTestUsersWithRegisteredAdmin):
                  }}
                  )
 
-    def test_admin_fetch_own_info(self):
-        self.api(self.token_admin, 'GET', self.prefix + '/', expected_code=http.status.OK,
-                 expected_result_subset={
-                     "username": "admin",
-                     "email": None,
-                     "permission_flags": 2,
-                     "first_name": None,
-                     "last_name": None
-                 })
+    # def test_admin_fetch_own_info(self):
+    #     self.api(self.token_admin, 'GET', self.prefix + '/', expected_code=http.status.OK,
+    #              expected_result_subset={
+    #                  "username": "admin",
+    #                  "email": None,
+    #                  "permission_flags": 2,
+    #                  "first_name": None,
+    #                  "last_name": None
+    #              })
 
     def test_create_user_and_apply_admin_role(self):
         self.api(None, 'POST', self.prefix + '/',

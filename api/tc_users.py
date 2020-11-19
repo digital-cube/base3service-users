@@ -32,7 +32,6 @@ class UserHandlerByUnits(base.Base):
     @base.auth()
     @base.api()
     async def get(self):
-        print('bou1')
         res = {}
 
         for u in self.orm_session.query(models.User).order_by(models.User.first_name,
@@ -48,18 +47,15 @@ class UserHandlerByUnits(base.Base):
         org_units = [x for x in org_units if x]
         org_units.sort()
 
-        print('bou2')
         sorted = [x for x in org_units if x not in ('Other', None)]
 
         if len(sorted) != len(org_units):
             sorted.append('Other')
 
         rrr = {}
-        print('bou3')
         for ou in sorted:
             rrr[ou] = res[ou]
 
-        print('rrr')
         return rrr
 
 
@@ -79,23 +75,6 @@ class AllUserHandler(base.Base):
             return res
 
         raise http.HttpInvalidParam({"message": f"invalid mapped by parameter {mapped_by}"})
-
-'''
-@base.route("/-all-")
-class All2UserHandler(base.Base):
-
-    async def get(self, list: bool = True, key: str = 'id'):
-        if list:
-            all_users = [
-                u.serialize() for u in self.orm_session.query(models.User)
-            ]
-        else:
-            all_users = {
-                getattr(u, key): u.serialize() for u in self.orm_session.query(models.User)
-            }
-
-        return all_users
-'''
 
 @base.route(URI="/all-with-details-mapped-by-ombis")
 class AllDetailsUserHandler(base.Base):
@@ -206,8 +185,6 @@ class CopyAllUsersFromOnePortal(base.Base):
             q = session.execute(
                 "select a.id, a.username, a.role_flags, a.password, u.client_name, u.first_name, u.last_name, u.profile_picture, u.org_unit, u.id_ombis from auth_users a left join users u on a.id=u.id where a.active=1 and a.role_flags & 253956!=0")
             for au in q:
-                # print(au)
-
                 id_one_user = au[0]
                 _email = au[1]
                 _one_portal_roleflags = au[2]
