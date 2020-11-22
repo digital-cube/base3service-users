@@ -16,9 +16,9 @@ db:
   type: 'postgres'
   port: 5432
   host: 'localhost'
-  username: 'demo'
-  password: 'demo'
-  database: 'demo_users'
+  username: 'blog'
+  password: '123'
+  database: 'demo_blog_users'
 
 authorization:
   key: 'Authorization'
