@@ -17,8 +17,8 @@ db:
   type: 'postgres'
   port: 5432
   host: 'postgres'
-  username: 'demo'
-  password: 'demo'
+  username: 'telmekom'
+  password: '123'
   database: 'users'
 
 authorization:
@@ -42,7 +42,7 @@ logging:
       class : logging.handlers.RotatingFileHandler
       level: DEBUG
       formatter: detailed
-      filename: /tmp/base_app.log
+      filename: /log/users.log
       backupCount: 3
   loggers:
     base:
