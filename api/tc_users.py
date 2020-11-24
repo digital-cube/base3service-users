@@ -76,6 +76,7 @@ class AllUserHandler(base.Base):
 
         raise http.HttpInvalidParam({"message": f"invalid mapped by parameter {mapped_by}"})
 
+
 @base.route(URI="/all-with-details-mapped-by-ombis")
 class AllDetailsUserHandler(base.Base):
 
@@ -83,10 +84,11 @@ class AllDetailsUserHandler(base.Base):
     @base.api()
     async def get(self):
         res = {u.id_ombis: u.serialize(['id', 'first_name', 'last_name', 'org_unit', 'email', 'profile_picture']) for u
-                in self.orm_session.query(models.User). \
-                    filter(models.User.id_ombis != None).all()}
+               in self.orm_session.query(models.User). \
+                   filter(models.User.id_ombis != None).all()}
 
         return res
+
 
 @base.route(URI="/info/by_uids")
 class UsersInfoHandler(base.Base):
@@ -129,7 +131,6 @@ class OmbisUsersSyncHandler(base.Base):
         users = {user.id_ombis for user in
                  self.orm_session.query(models.User).filter(models.User.id_ombis.in_(ombis_ids)).all()}
 
-
         ombis_url = f'http://{ocfg["host"]}:{ocfg["port"]}/rest/web/00000001/mitarbeiter?filter=eq(Gesperrt,0)&fields=UserID,Suchbegriff&refs=Abteilung(fields=DisplayName) '
         org_units = ombis.get(ombis_url)
         org_units = {
@@ -137,12 +138,11 @@ class OmbisUsersSyncHandler(base.Base):
             for user in org_units['Data']
         }
 
-
-
-
-
         commit = False
         added, skipped = 0, 0
+
+        prepare4absences = []
+
         for s_id_ombis in res.keys():
             id_ombis = int(s_id_ombis)
             if s_id_ombis in users:
@@ -152,18 +152,25 @@ class OmbisUsersSyncHandler(base.Base):
             added += 1
 
             u = res[s_id_ombis]
-            self.orm_session.add(models.User(username=u['username'],
-                                             password=str(uuid.uuid4()),
-                                             role_flags=0,
-                                             first_name=u['first_name'],
-                                             last_name=u['last_name'],
-                                             org_unit=org_units[s_id_ombis] if s_id_ombis in org_units else 'Other',
-                                             id_ombis=id_ombis
-                                             ))
+            usr = models.User(username=u['username'],
+                              password=str(uuid.uuid4()),
+                              role_flags=0,
+                              first_name=u['first_name'],
+                              last_name=u['last_name'],
+                              org_unit=org_units[s_id_ombis] if s_id_ombis in org_units else 'Other',
+                              id_ombis=id_ombis
+                              )
+            self.orm_session.add(usr)
             commit = True
+
+            prepare4absences.append(usr.id)
 
         if commit:
             self.orm_session.commit()
+
+        ires = await base.ipc.call(self.request, 'absences', 'POST', '/sync', body={
+            'user_ids': prepare4absences
+        })
 
         return {'added': added, 'skipped': skipped}
 
@@ -334,6 +341,7 @@ class CheckToken(base.Base):
     async def get(self):
         return None
 
+
 def create_new_user_session(orm_session, username, password):
     user = orm_session.query(models.User).filter(models.User.username == username,
                                                  models.User.password == password).one_or_none()
@@ -345,6 +353,6 @@ def create_new_user_session(orm_session, username, password):
     orm_session.commit()
 
     import base
-    base.store.set(token.id,'1')
+    base.store.set(token.id, '1')
 
     return {'id': user.id, 'token': token.jwt}, http.status.CREATED
