@@ -25,6 +25,14 @@ class AboutUserServiceHandler(base.Base):
     async def get(self):
         return {'service': 'users'}
 
+@base.route('/about/authorized')
+class AboutAuthUserServiceHandler(base.Base):
+
+    @base.auth()
+    @base.api()
+    async def get(self):
+        return {'service': 'users/authorized'}
+
 
 def format_password(user, password):
     return f"{user.id}{password}"
