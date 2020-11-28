@@ -14,7 +14,8 @@ else:
     base.route.set('prefix', base.config.conf['prefix'])
 
 import orm.mysql_portal as one_portal_orm
-import ombis
+
+from common import ombis
 
 
 @base.route('/info')
@@ -107,17 +108,19 @@ class UsersInfoHandler(base.Base):
 class OmbisUsersSyncHandler(base.Base):
 
     @base.api()
-    async def post(self, ombis_id_users: str = 'all'):
-        # ocfg = base.registry.service('users')['ombis']
-        ocfg = base.config.conf['ombis']
+    async def patch(self, ombis_id_users: str = 'all'):
 
-        filter = '?'
+        params = {}
+
         if ombis_id_users != 'all':
             ombis_id_users = ','.join([str(int(x)) for x in ombis_id_users.split(',')])
-            filter = f'?filter=in(ID,{ombis_id_users})&'
+            params['filter'] = f'in(ID,{ombis_id_users})'
 
-        ombis_url = f'http://{ocfg["host"]}:{ocfg["port"]}/rest/web/00000001/user{filter}fields=ID,Name,FullName'
-        res = ombis.get(ombis_url)
+        params['fields'] = 'ID,Name,FullName'
+
+        ombis_url = f'/rest/web/00000001/user'
+
+        res = await ombis.get(ombis_url, params)
 
         res = {
             user['Fields']['ID']: {
@@ -132,8 +135,13 @@ class OmbisUsersSyncHandler(base.Base):
         users = {user.id_ombis for user in
                  self.orm_session.query(models.User).filter(models.User.id_ombis.in_(ombis_ids)).all()}
 
-        ombis_url = f'http://{ocfg["host"]}:{ocfg["port"]}/rest/web/00000001/mitarbeiter?filter=eq(Gesperrt,0)&fields=UserID,Suchbegriff&refs=Abteilung(fields=DisplayName) '
-        org_units = ombis.get(ombis_url)
+        ombis_url = f'/rest/web/00000001/mitarbeiter'
+
+        params = {'filter': 'eq(Gesperrt,0)',
+                  'fields': 'UserID,Suchbegriff',
+                  'refs': 'Abteilung(fields=DisplayName)'}
+
+        org_units = await ombis.get(ombis_url, params)
         org_units = {
             str(user['Fields']['UserID']): user['References']['Abteilung']['Fields']['DisplayName']
             for user in org_units['Data']
