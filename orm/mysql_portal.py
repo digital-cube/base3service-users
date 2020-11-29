@@ -24,6 +24,7 @@ def make_database_url(db_type, name, host, port, username, password, charset='ut
         raise NameError("Unknown database type: {}".format(db_type))
 
 
+
 telmekom_sql_base = declarative_base()
 telmekom_orm = None
 

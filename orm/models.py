@@ -10,9 +10,16 @@ from base import orm
 from base import common
 
 # Telmekom
-
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import JSONB
+
+
+class Option_users(orm.BaseSql, orm.sql_base):
+    __tablename__ = 'options_users'
+
+    key = Column(String, unique=True)
+    value = Column(JSONB, nullable=True)
+
 
 # /Telmekom
 
