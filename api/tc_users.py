@@ -27,6 +27,32 @@ class GeneralInfo(base.Base):
                 'service-version': '0.1.0'}
 
 
+@base.route(URI="/by-ombis")
+class UserHandlerByOmbis(base.Base):
+
+    @base.auth()
+    @base.api()
+    async def get(self):
+
+        return {u.id_ombis: u.serialize(['id', 'first_name', 'last_name', 'org_unit', 'profile_picture'])
+                for u in self.orm_session.query(models.User).filter(
+                models.User.id_ombis != None
+            ).all()}
+
+@base.route(URI="/by-id")
+class UserHandlerByID(base.Base):
+
+    @base.auth()
+    @base.api()
+    async def get(self):
+
+        return {u.id: u.serialize(['id_ombis', 'first_name', 'last_name', 'org_unit', 'profile_picture'])
+                for u in self.orm_session.query(models.User).filter(
+                models.User.id_ombis != None
+            ).all()}
+
+
+
 @base.route(URI="/by-org-units")
 class UserHandlerByUnits(base.Base):
 
