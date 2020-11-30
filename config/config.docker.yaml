@@ -34,7 +34,7 @@ db:
   host: $POSTGRES_HOST
   username: $POSTGRES_USER
   password: $POSTGRES_PASSWORD
-  database: 'tc_users'
+  database: $POSTGRES_DBNAME
 
 authorization:
   key: 'jwt'
