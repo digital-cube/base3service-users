@@ -279,6 +279,10 @@ class PortalUserLoginHandler(base.Base):
         http_client = AsyncHTTPClient()
         target = os.getenv('ONEPORTAL', 'telmekom-one.dev.digitalcube.rs')
         uri = f'https://{target}/user/login'
+        
+        if 'staging.one.telmekom.net' in target:
+            uri = f'http://{target}/user/login'
+
         try:
             response = await http_client.fetch(uri, method='POST',
                                                body=json.dumps({'username': username, 'password': password}))
