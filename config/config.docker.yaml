@@ -57,15 +57,42 @@ logging:
       class : logging.handlers.RotatingFileHandler
       level: DEBUG
       formatter: detailed
-      filename: /tmp/base_app.log
+      filename: /logs/base_app.log
       backupCount: 3
+    ombis_file:
+      class : logging.handlers.RotatingFileHandler
+      level: DEBUG
+      formatter: detailed
+      filename: /logs/ombis_users.log
+      backupCount: 3
+    ipc_file:
+      class : logging.handlers.RotatingFileHandler
+      level: DEBUG
+      formatter: detailed
+      filename: /logs/ipc_users.log
+      backupCount: 3
+
   loggers:
+
+    ombis:
+      level: DEBUG
+      handlers:
+        - ombis_file
+        - console
+
+    ipc:
+      level: DEBUG
+      handlers:
+        - ipc_file
+        - console
+
     base:
       level: DEBUG
       handlers:
         - console
         - file
       propagate: no
+
     tornado.access:
       level: DEBUG
       handlers:
