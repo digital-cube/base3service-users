@@ -292,8 +292,10 @@ class PortalUserLoginHandler(base.Base):
             raise http.HttpInternalServerError({'message': 'Token not found'})
 
         except Exception as e:
+            print(4,f'login to {uri} : response failed')
+            print(4,'.')
             raise http.HttpErrorUnauthorized({'message': f'Error logging user on portal {target}', 'e': str(e)})
-
+            
         pass
 
 
