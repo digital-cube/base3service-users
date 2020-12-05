@@ -23,8 +23,8 @@ class GeneralInfo(base.Base):
 
     @base.api()
     async def get(self):
-        return {'environment': os.getenv('TC_ENVIRONMENT', 'undefined - setup TC_ENVIRONMENT variable'),
-                'service-version': '0.1.0'}
+        return {'environment': 'development', #os.getenv('TC_ENVIRONMENT', 'undefined - setup TC_ENVIRONMENT variable'),
+                'service-version': '0.2.0'}
 
 
 @base.route(URI="/by-ombis")
