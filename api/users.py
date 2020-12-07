@@ -257,6 +257,13 @@ class UsersHandler(base.Base):
 
 @base.route('/sessions')
 class SessionsHandler(base.Base):
+
+    @base.auth()
+    @base.api()
+    async def get(self):
+        return {'id_user': self.id_user,
+                'id_session': self.id_session}
+
     @base.api()
     async def post(self, username: str, password: str):
         user = self.orm_session.query(models.User). \
