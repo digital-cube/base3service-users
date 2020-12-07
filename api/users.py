@@ -18,12 +18,21 @@ else:
     base.route.set('prefix', base.config.conf['prefix'])
 
 
-@base.route('/about')
-class AboutUserServiceHandler(base.Base):
+import socket
+
+
+@base.route(URI="/about")
+class AboutUsersServiceHandler(base.Base):
 
     @base.api()
     async def get(self):
-        return {'service': 'users'}
+        return {'service': 'tickets', 'type': 'readonly', 'running_on': socket.gethostbyname(socket.gethostname())}
+
+    @base.api()
+    async def put(self):
+        return {'service': 'tickets', 'type': 'readwrite', 'running_on': socket.gethostbyname(socket.gethostname())}
+
+
 
 @base.route('/about/authorized')
 class AboutAuthUserServiceHandler(base.Base):
