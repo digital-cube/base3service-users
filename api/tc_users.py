@@ -205,7 +205,7 @@ class OmbisUsersSyncHandler(base.Base):
 
         ires = await base.ipc.call(self.request, 'absences', 'POST', '/sync', body={
             'user_ids': prepare4absences
-        })
+        }, readonly=True)
 
         return {'added': added, 'skipped': skipped}
 
