@@ -33,7 +33,7 @@ db:
   host: 'localhost'
   username: 'telmekom'
   password: '123'
-  database: 'tc_users'
+  database: 'one_users'
 
 authorization:
   key: 'jwt'

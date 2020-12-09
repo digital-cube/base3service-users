@@ -26,11 +26,19 @@ class AboutUsersServiceHandler(base.Base):
 
     @base.api()
     async def get(self):
-        return {'service': 'tickets', 'type': 'readonly', 'running_on': socket.gethostbyname(socket.gethostname())}
+        try:
+            host = socket.gethostbyname(socket.gethostname())
+        except:
+            host = 'local'
+        return {'service': 'users', 'type': 'readonly', 'running_on': host}
 
     @base.api()
     async def put(self):
-        return {'service': 'tickets', 'type': 'readwrite', 'running_on': socket.gethostbyname(socket.gethostname())}
+        try:
+            host = socket.gethostbyname(socket.gethostname())
+        except:
+            host = 'local'
+        return {'service': 'users', 'type': 'readwrite', 'running_on': host}
 
 
 

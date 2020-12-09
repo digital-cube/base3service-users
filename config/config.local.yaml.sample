@@ -18,7 +18,7 @@ db:
   host: 'localhost'
   username: 'demo'
   password: 'demo'
-  database: 'demo_users'
+  database: 'one_users'
 
 authorization:
   key: 'Authorization'
