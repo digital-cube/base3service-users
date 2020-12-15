@@ -282,6 +282,15 @@ class PortalUserLoginHandler(base.Base):
         
         if 'staging.one.telmekom.net' in target:
             uri = f'http://{target}/user/login'
+        if 'telmekomclient' in target:
+            uri = f'http://{target}:8803/user/login'
+        if 'localhost' in target:
+            uri = f'http://{target}/user/login'
+
+        
+        print("URI",uri)
+        print(json.dumps({'username': username, 'password': password}))
+
 
         try:
             response = await http_client.fetch(uri, method='POST',
