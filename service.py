@@ -10,7 +10,6 @@ if __name__ == "__main__":
     base.config.load_private_key(my_dir_name + '/keys/jwt.private_key')
 
     importlib.import_module('api.users')
-    importlib.import_module('api.tc_users')
     importlib.import_module('lookup.user_permissions')
 
     from base import store

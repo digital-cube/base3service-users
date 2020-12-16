@@ -1,6 +1,6 @@
 name: 'users'
 description: 'base3 application'
-prefix: '/tcapi/users'
+prefix: '/api/users'
 app_version: '0.0.1'
 host: 'localhost'
 port: &port 9000
@@ -12,31 +12,16 @@ store:
   host: 'localhost'
   port: '6379'
 
-mysql:
-  db_host: $MYSQL_DBHOST
-  db_name: $MYSQL_DBNAME
-  db_user: $MYSQL_DBUSER
-  db_password: $MYSQL_DBPASSWORD
-  db_port: "3306"
-  db_type: "mysql"
-  db_charset: "utf8"
-
-ombis:
-  host: "10.81.16.45"
-  user: "WebService"
-  password: "Omb!Rest#"
-  port: "8070"
-
 db:
   type: 'postgres'
   port: 5432
-  host: 'localhost'
-  username: 'telmekom'
-  password: '123'
-  database: 'one_users'
+  host: localhost
+  username: pos
+  password: 123
+  database: pos_users
 
 authorization:
-  key: 'jwt'
+  key: 'Authorization'
 
 logging:
   version: 1
@@ -56,28 +41,16 @@ logging:
       class : logging.handlers.RotatingFileHandler
       level: DEBUG
       formatter: detailed
-      filename: /tmp/demo_users.log
-      backupCount: 3
-    ombis_file:
-      class : logging.handlers.RotatingFileHandler
-      level: DEBUG
-      formatter: detailed
-      filename: /tmp/ombis_users.log
+      filename: /tmp/pos_users.log
       backupCount: 3
     ipc_file:
       class : logging.handlers.RotatingFileHandler
       level: DEBUG
       formatter: detailed
-      filename: /tmp/ipc_users.log
+      filename: /tmp/pos_ipc_users.log
       backupCount: 3
 
   loggers:
-
-    ombis:
-      level: DEBUG
-      handlers:
-        - ombis_file
-        - console
 
     ipc:
       level: DEBUG

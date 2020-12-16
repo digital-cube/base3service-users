@@ -1,10 +1,9 @@
 name: 'users'
 description: 'base3 application'
-prefix: '/tcapi/users'
+prefix: '/api/users'
 app_version: '0.0.1'
 host: 'users'
 port: &port 80
-
 
 apptype: 'micro-service'
 
@@ -13,21 +12,6 @@ store:
   host: 'redis'
   port: '6379'
 
-mysql:
-  db_host: $MYSQL_DBHOST
-  db_name: $MYSQL_DBNAME
-  db_user: $MYSQL_DBUSER
-  db_password: $MYSQL_DBPASSWORD
-  db_port: "3306"
-  db_type: "mysql"
-  db_charset: "utf8"
-
-ombis:
-  host: "10.81.16.45"
-  user: "WebService"
-  password: "Omb!Rest#"
-  port: "8070"
-
 db:
   type: 'postgres'
   port: $POSTGRES_PORT
@@ -35,9 +19,9 @@ db:
   username: $POSTGRES_USER
   password: $POSTGRES_PASSWORD
   database: $POSTGRES_DBNAME
-
+  
 authorization:
-  key: 'jwt'
+  key: 'Authorization'
 
 logging:
   version: 1
@@ -57,13 +41,7 @@ logging:
       class : logging.handlers.RotatingFileHandler
       level: DEBUG
       formatter: detailed
-      filename: /logs/base_app.log
-      backupCount: 3
-    ombis_file:
-      class : logging.handlers.RotatingFileHandler
-      level: DEBUG
-      formatter: detailed
-      filename: /logs/ombis_users.log
+      filename: /logs/users.log
       backupCount: 3
     ipc_file:
       class : logging.handlers.RotatingFileHandler
@@ -73,12 +51,6 @@ logging:
       backupCount: 3
 
   loggers:
-
-    ombis:
-      level: DEBUG
-      handlers:
-        - ombis_file
-        - console
 
     ipc:
       level: DEBUG
@@ -109,4 +81,3 @@ logging:
     level: WARNING
     handlers:
       - console
-  
