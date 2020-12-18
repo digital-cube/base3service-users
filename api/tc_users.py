@@ -142,7 +142,8 @@ class OmbisUsersSyncHandler(base.Base):
             ombis_id_users = ','.join([str(int(x)) for x in ombis_id_users.split(',')])
             params['filter'] = f'in(ID,{ombis_id_users})'
 
-        params['fields'] = 'ID,Name,FullName'
+        params = {'filter': 'eq(Locked,0)',
+                  'fields': 'ID,Name,FullName'}
 
         ombis_url = f'/rest/web/00000001/user'
 
