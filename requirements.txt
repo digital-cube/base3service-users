@@ -1,0 +1,3 @@
+-e ../base3
+asynctest==0.13.0
+faker
