@@ -56,7 +56,11 @@ class UsersLoginHandler(base.Base):
 
         token = await _session.token
 
-        return {'id': str(user.id), 'token': token}, base.http.status.CREATED
+        return {'id': str(user.id), 
+                'token': token,
+                'profile_image': 'digital-cube-logo.png'
+                
+                }, base.http.status.CREATED
 
     @base.auth()
     @base.api()
@@ -69,6 +73,9 @@ class UsersLoginHandler(base.Base):
         user = await models.users.AuthUser.get_or_none(id=self.id_user)
         if user:
             user_data = await user.serialize()
+            
+            user_data['profile_image'] = 'digital-cube-logo.png'
+            
             return user_data
         raise base.http.HttpErrorUnauthorized
 
