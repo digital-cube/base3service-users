@@ -3,7 +3,7 @@ import http
 from unittest.mock import patch
 
 from base import store
-from tests.helpers import BaseUserTest
+from tests.helpers import BaseUserTest, token2user
 from lookup.user_roles import SUPERUSER
 from lookup.alarm_types import ALARM1
 from lookup.notification_type import EMAIL
@@ -12,7 +12,8 @@ from lookup.notification_type import EMAIL
 class TestTenants(BaseUserTest):
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_add_tenant_as_non_authorized_user(self):
+    @patch('base.src.base.token.token2user', token2user)
+    def test_add_tenant_as_non_authorized_user(self, *_):
         _data = {
             'tenant': {
                 'name': 'Tenant'
@@ -43,7 +44,8 @@ class TestTenants(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_get_tenants_unauthorized(self):
+    @patch('base.src.base.token.token2user', token2user)
+    def test_get_tenants_unauthorized(self, *_):
         self.api(None, 'GET', self.prefix+'/tenants', expected_code=http.HTTPStatus.UNAUTHORIZED)
 
         self.register_user('user', '123')

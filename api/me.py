@@ -4,14 +4,14 @@ from logging import getLogger
 import base
 import models
 from common.components import UserBaseHandler
-from common.utils import format_password
+from common.utils import format_password, password_match
 import lookup.alarm_types as alarm_types
 import lookup.notification_type as notification_types
 
 log = getLogger('base')
 
 
-@base.route(URI="/me/settings")
+@base.route(URI='/me/change-data')
 class MeHandler(base.Base, UserBaseHandler):
     """
     User's API
@@ -19,47 +19,11 @@ class MeHandler(base.Base, UserBaseHandler):
 
     @base.auth()
     @base.api()
-    async def get(self):
-        """
-        Get the user
-        :return: logged user's data
-        """
-        user = await models.AuthUser.filter(id=self.id_user).get_or_none()
-        if not user:
-            raise base.http.HttpErrorNotFound
-
-        _users_data = await user.serialize()
-        return _users_data
-
-    @base.auth()
-    @base.api()
-    async def post(self, username: str, password: str):
-        """
-        Edit logged user's username and password
-        :param username: str - user's username
-        :param password: str - user's password
-        :return: no content
-        """
-        username = username.strip()
-        password = password.strip()
-
-        user = await models.AuthUser.filter(id=self.id_user).get_or_none()
-        if not user:
-            raise base.http.HttpErrorNotFound
-
-        user.username = username
-        user.password = format_password(username, password)
-        await user.save()
-        await self.update_user_session(user)
-
-    @base.auth()
-    @base.api()
-    async def patch(self, role_flags=None, first_name: str = None, last_name: str = None, email: str = None,
+    async def patch(self, first_name: str = None, last_name: str = None, email: str = None,
                     alarm_type: int = None, notification_type: int = None, phone_number: str = None,
                     active: bool = None, last_used_application: str = None):
         """
         Edit user's data
-        :param role_flags: int - user's role flags
         :param first_name: user's first name
         :param last_name: user's last name
         :param email: user's email
@@ -77,10 +41,6 @@ class MeHandler(base.Base, UserBaseHandler):
             raise base.http.HttpErrorNotFound
 
         user_data = await models.User.filter(auth_user=user).get_or_none()
-        #
-        # if role_flags is not None and user.role_flags != role_flags:
-        #     user.role_flags = role_flags
-        #     _changes.append('role_flags')
 
         if first_name is not None and user_data.first_name != first_name:
             user_data.first_name = first_name
@@ -93,30 +53,30 @@ class MeHandler(base.Base, UserBaseHandler):
         if email is not None and user_data.email != email:
             user_data.email = email
             _changes.append('email')
-
-        if alarm_type is not None and user_data.alarm_type != alarm_type:
-            if not bool(alarm_type & alarm_types.ALL):
-                log.error(f'Alarm type {alarm_type} not exists')
-                return {'message': 'Invalid alarm type'}, base.http.status.BAD_REQUEST
-
-            user_data.alarm_type = alarm_type
-            _changes.append('alarm_type')
-
-        if notification_type is not None and user_data.notification_type != notification_type:
-            if not bool(notification_type & notification_types.ALL):
-                log.error(f'Notification type {notification_type} not exists')
-                return {'message': 'Invalid notification type'}, base.http.status.BAD_REQUEST
-
-            user_data.notification_type = notification_type
-            _changes.append('notification_type')
+        #
+        # if alarm_type is not None and user_data.alarm_type != alarm_type:
+        #     if not bool(alarm_type & alarm_types.ALL):
+        #         log.error(f'Alarm type {alarm_type} not exists')
+        #         return {'message': 'Invalid alarm type'}, base.http.status.BAD_REQUEST
+        #
+        #     user_data.alarm_type = alarm_type
+        #     _changes.append('alarm_type')
+        #
+        # if notification_type is not None and user_data.notification_type != notification_type:
+        #     if not bool(notification_type & notification_types.ALL):
+        #         log.error(f'Notification type {notification_type} not exists')
+        #         return {'message': 'Invalid notification type'}, base.http.status.BAD_REQUEST
+        #
+        #     user_data.notification_type = notification_type
+        #     _changes.append('notification_type')
 
         if phone_number is not None and user_data.phone != phone_number:
             user_data.phone = phone_number
             _changes.append('phone_number')
 
-        if active is not None and user.active != active:
-            user.active = active
-            _changes.append('active')
+        # if active is not None and user.active != active:
+        #     user.active = active
+        #     _changes.append('active')
 
         if last_used_application is not None:
             _user_data = copy.deepcopy(user_data.data) if user_data.data else {}
@@ -131,4 +91,75 @@ class MeHandler(base.Base, UserBaseHandler):
             await self.update_user_session(user)
 
         return {'changes': _changes}
+
+
+@base.route(URI="/me/change-username")
+class MeUsernameHandler(base.Base, UserBaseHandler):
+    """
+    User's API
+    """
+
+    @base.auth()
+    @base.api()
+    async def post(self, username: str, password: str):
+        """
+        Change user's username
+        :param username: user's username
+        :param password: user's password
+        :return: 200 - ok
+                400 - error
+        """
+        username = username.strip()
+        password = password.strip()
+
+        user = await models.AuthUser.filter(id=self.id_user).get_or_none()
+        if not user:
+            raise base.http.HttpErrorNotFound
+
+        if not password_match(user.username, password, user.password):
+            log.error(f'Password for user {user.username} -> {password} not match')
+            raise base.http.HttpErrorUnauthorized
+
+        user.username = username
+        user.password = format_password(username, password)
+
+        await user.save()
+        await self.update_user_session(user)
+
+        # todo: send email
+
+
+@base.route(URI="/me/change-password")
+class MePasswordHandler(base.Base, UserBaseHandler):
+    """
+    User's API
+    """
+
+    @base.auth()
+    @base.api()
+    async def post(self, password: str, new_password: str):
+        """
+        Change user's username
+        :param password: user's password
+        :param new_password: user's new password
+        :return: 200 - ok
+                400 - error
+        """
+        password = password.strip()
+        new_password = new_password.strip()
+
+        user = await models.AuthUser.filter(id=self.id_user).get_or_none()
+        if not user:
+            raise base.http.HttpErrorNotFound
+
+        if not password_match(user.username, password, user.password):
+            log.error(f'Password for user {user.username} -> {password} not match')
+            raise base.http.HttpErrorUnauthorized
+
+        user.password = format_password(user.username, new_password)
+
+        await user.save()
+
+        # todo: send email
+
 

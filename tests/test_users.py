@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from base import store
 
-from tests.helpers import BaseUserTest
+from tests.helpers import BaseUserTest, token2user
 from lookup.user_roles import ADMIN
 from lookup.user_roles import SUPERUSER
 from lookup.user_roles import DEVELOPER
@@ -14,7 +14,8 @@ from lookup.user_roles import DEVELOPER
 class TestUsers(BaseUserTest):
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_get_users_unauthorized(self):
+    @patch('base.src.base.token.token2user', token2user)
+    def test_get_users_unauthorized(self, *_):
         self.api(None, 'GET', f'{self.prefix}', expected_code=http.HTTPStatus.UNAUTHORIZED,
                  expected_result_contain_keys=['message'])
 
@@ -142,7 +143,8 @@ class TestUser(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())  # has to be patched not to use redis without the config
-    def test_get_user_unauthorized(self):
+    @patch('base.src.base.token.token2user', token2user)
+    def test_get_user_unauthorized(self, *_):
         self.api(None, 'GET', f'{self.prefix}/1', expected_code=http.HTTPStatus.UNAUTHORIZED,
                  expected_result_contain_keys=['message'])
         self.register_user('user', '123')
