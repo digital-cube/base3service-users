@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from base import store
 
-from tests.helpers import BaseUserTest
+from tests.helpers import BaseUserTest, token2user
 from lookup.user_roles import ADMIN
 from lookup.user_roles import SUPERUSER
 from lookup.user_roles import DEVELOPER
@@ -14,8 +14,9 @@ from lookup.user_roles import DEVELOPER
 class TestLoggedUsers(BaseUserTest):
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
+    @patch('base.src.base.token.token2user', token2user)
     def test_get_user_unauthorized(self):
-        self.api(None, 'GET', f'{self.prefix}/me', expected_code=http.HTTPStatus.UNAUTHORIZED,
+        self.api(None, 'GET', f'{self.prefix}/me/settings', expected_code=http.HTTPStatus.UNAUTHORIZED,
                  expected_result_contain_keys=['message'])
 
         # self.show_last_result()
@@ -25,7 +26,7 @@ class TestLoggedUsers(BaseUserTest):
     def test_get_logged_users_data(self):
         self.register_user(f'user', '123')
 
-        self.api(self.token, 'GET', f'{self.prefix}/me', expected_code=http.HTTPStatus.OK,
+        self.api(self.token, 'GET', f'{self.prefix}/me/settings', expected_code=http.HTTPStatus.OK,
                  expected_result_contain_keys=['id', 'username', 'first_name', 'last_name'])
 
         # self.show_last_result()
@@ -35,7 +36,7 @@ class TestLoggedUsers(BaseUserTest):
     def test_edit_user_data(self):
         self.register_user('user', '123')
 
-        self.api(self.token, 'GET', f'{self.prefix}/me', expected_code=http.HTTPStatus.OK,
+        self.api(self.token, 'GET', f'{self.prefix}/me/settings', expected_code=http.HTTPStatus.OK,
                  expected_result_contain_keys=['id', 'username', 'email', 'first_name', 'last_name', 'display_name'])
 
         _data = {
@@ -45,10 +46,10 @@ class TestLoggedUsers(BaseUserTest):
             'email': 'some@other.com',
             'phone_number': '+22222222222',
         }
-        self.api(self.token, 'PATCH', f'{self.prefix}/me', body=_data, expected_code=http.HTTPStatus.OK,
+        self.api(self.token, 'PATCH', f'{self.prefix}/me/settings', body=_data, expected_code=http.HTTPStatus.OK,
                  expected_result_contain_keys=['changes'])
 
-        self.api(self.token, 'GET', f'{self.prefix}/me', expected_code=http.HTTPStatus.OK,
+        self.api(self.token, 'GET', f'{self.prefix}/me/settings', expected_code=http.HTTPStatus.OK,
                  expected_result_contain_keys=['id', 'username', 'email', 'first_name', 'last_name', 'display_name'])
 
         self.assertEqual('some@other.com', self.last_result['email'])
@@ -68,7 +69,7 @@ class TestLoggedUsers(BaseUserTest):
         self.register_user('admin', '123', role_flags=ADMIN)
         _admin_token = self.last_result['token']
 
-        self.api(self.token, 'GET', f'{self.prefix}/me', expected_code=http.HTTPStatus.OK,
+        self.api(self.token, 'GET', f'{self.prefix}/me/settings', expected_code=http.HTTPStatus.OK,
                  expected_result_contain_keys=['id', 'username', 'email', 'first_name', 'last_name', 'display_name'])
 
         _login_data = {
@@ -78,9 +79,9 @@ class TestLoggedUsers(BaseUserTest):
         self.api(None, 'POST', self.prefix+'/session', body=_login_data, expected_code=http.HTTPStatus.UNAUTHORIZED,
                  expected_result_contain_keys=['message'])
 
-        self.api(self.token, 'POST', f'{self.prefix}/me', body=_login_data, expected_code=http.HTTPStatus.NO_CONTENT)
+        self.api(self.token, 'POST', f'{self.prefix}/me/settings', body=_login_data, expected_code=http.HTTPStatus.NO_CONTENT)
 
-        self.api(self.token, 'GET', f'{self.prefix}/me', expected_code=http.HTTPStatus.OK,
+        self.api(self.token, 'GET', f'{self.prefix}/me/settings', expected_code=http.HTTPStatus.OK,
                  expected_result_contain_keys=['id', 'username', 'email', 'first_name', 'last_name', 'display_name'])
 
         self.assertEqual('user_new', self.last_result['username'])

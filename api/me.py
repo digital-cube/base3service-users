@@ -11,7 +11,7 @@ import lookup.notification_type as notification_types
 log = getLogger('base')
 
 
-@base.route(URI="/me")
+@base.route(URI="/me/settings")
 class MeHandler(base.Base, UserBaseHandler):
     """
     User's API
@@ -77,10 +77,10 @@ class MeHandler(base.Base, UserBaseHandler):
             raise base.http.HttpErrorNotFound
 
         user_data = await models.User.filter(auth_user=user).get_or_none()
-
-        if role_flags is not None and user.role_flags != role_flags:
-            user.role_flags = role_flags
-            _changes.append('role_flags')
+        #
+        # if role_flags is not None and user.role_flags != role_flags:
+        #     user.role_flags = role_flags
+        #     _changes.append('role_flags')
 
         if first_name is not None and user_data.first_name != first_name:
             user_data.first_name = first_name

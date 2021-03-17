@@ -22,9 +22,27 @@ random_uuid = '00000000-0000-0000-0420-000000000000'
 id_user = '00000000-0000-0000-0000-000000000001'
 id_session = '00000000-0000-0000-0000-000000000002'
 
+user = {
+    "id": id_user,
+    "username": "user",
+    "first_name": "User",
+    "last_name": "Test",
+    "display_name": "User Test",
+    "email": "user@test.loc",
+    "active": True,
+    "role_flags": 1,
+    "roles": [
+        "USER"
+    ],
+    "scopes": {
+    },
+    "tenant": None
+}
+
 
 def token2user(_):
     return {
+        'user': user,
         'id': id_session,
         'id_user': id_user,
         'permissions': 0
