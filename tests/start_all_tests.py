@@ -15,11 +15,12 @@ from tests.test_tenants import TestTenants
 from tests.test_users_scopes import TestUsersScopes
 from tests.test_users import TestUsers
 from tests.test_users import TestUser
+from tests.test_logged_users import TestLoggedUsers
 
 
 def all():
     _tests = [
-        TestUsersAbout, TestRegisterUsers, TestLoginUsers, TestTenants, TestUsersScopes, TestUsers, TestUser
+        TestUsersAbout, TestRegisterUsers, TestLoginUsers, TestTenants, TestUsersScopes, TestUsers, TestUser, TestLoggedUsers
     ]
 
     _loader = unittest.TestLoader()

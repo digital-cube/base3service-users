@@ -13,7 +13,7 @@ from lookup.alarm_types import ALARM1
 from lookup.notification_type import EMAIL
 
 import sys
-print("USING",  sys.executable)
+# print("USING",  sys.executable)
 
 current_file_folder = os.path.dirname(os.path.realpath(__file__))
 root_folder = os.path.abspath(os.path.join(current_file_folder, '..'))
@@ -100,6 +100,8 @@ class BaseUserTest(test.BaseTest):
 
         self.api(None, 'POST', f'{self.prefix}/register', body=_data, expected_code=http.status.CREATED,
                  expected_result_contain_keys=['id', 'token'])
+
+        self.token = self.last_result['token']
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
     def add_tenant(self, name='Tenant'):
