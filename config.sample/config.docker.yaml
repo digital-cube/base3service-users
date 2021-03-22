@@ -1,0 +1,54 @@
+name: &name 'users'               # Name of the application
+description: 'base3 application'  # Description of the application
+prefix: '/api/users'              # Route prefixes to be prepended to all routes
+app_version: '0.0.1'              # Current version of the app
+host: 'users'                     # Application host location
+port: &port 80                    # Port on which the application will listen to requests
+tornado_settings: {}              # Tornado Application additional settings
+verbose: true                     # More verbose output
+
+apptype: 'micro-service'          # The type of the application ('micro-service', 'monolith')
+
+store:
+  type: 'redis'                   # Which type of common data store and registry will be used ('redis', 'memory')
+  host: 'redis'                   # Location of the Redis server
+  port: '6379'                    # Port for the Redis server
+
+use_database: true                # Use database in an application
+
+APIs:                             # APIs
+  - api.about
+  - api.me
+  - api.users
+  - api.users_login
+  - api.users_register
+  - api.tenants
+  - api.users_scopes
+
+db: &db                           # Database to be used by the application
+  type: 'postgres'                # Currently supported: 'postgres'
+  port: 5432                      # Database port
+  host: 'postgres'                # Database host
+  user: 'inventory'               # Database username
+  password: '123'                 # Database password
+  database: 'inventory_users'     # Database name
+
+tortoise:                         # tortoise ORM configuration
+  connections:
+    *name:
+      engine: 'tortoise.backends.asyncpg'
+      credentials: *db
+  apps:
+    *name:
+      models:
+        - 'aerich.models'
+        - 'models.session'
+        - 'models.users'
+      # If no default_connection specified, defaults to 'default'
+      default_connection: *name
+  use_tz: false
+  timezone: 'CET'
+
+authorization:
+  # Header to read for the Authorization key
+  key: 'Authorization'
