@@ -52,3 +52,9 @@ tortoise:                         # tortoise ORM configuration
 authorization:
   # Header to read for the Authorization key
   key: 'Authorization'
+
+services:
+  documents:
+    prefix: '/api/documents'
+  flow:
+    prefix: '/api/flow'

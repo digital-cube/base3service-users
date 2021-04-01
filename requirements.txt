@@ -2,3 +2,4 @@ wheel
 base3
 asynctest==0.13.0
 faker
+pip install /shared

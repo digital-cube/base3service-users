@@ -10,27 +10,33 @@ from lookup.user_roles import names_list as roles_names_list
 from lookup.user_roles import ADMINISTRATORS
 import lookup.alarm_types as alarm_types
 import lookup.notification_type as notification_types
+from shared.src.ipc_helpers.documents import get_documents_for_an_instance
 
 log = getLogger('base')
 
 
 @base.route()
-class UsersHandler(base.Base):
+class UsersHandler(base.Base, UserBaseHandler):
     """
     Users API
     """
 
-    @base.auth(permissions=ADMINISTRATORS)
+    @base.auth()
     @base.api()
-    async def get(self, limit: int = 100, offset: int = 0, order_by: str = 'username', order_direction: str ='asc'):
+    async def get(self, limit: int = 100, offset: int = 0, order_by: str = 'username', order_direction: str = 'asc',
+                  fields: list = None, ids_users_csv: str = None):
         """
         Get the list of users
         :param limit: int - number of users to retrieve
         :param offset: int - number of first records to ignore
         :param order_by: str - order by field
         :param order_direction:  str - order direction
+        :param fields: list - fields of a user object to send in the response
+        :param ids_users_csv: str - csv of users ids to retrieve
         :return: list of users
         """
+
+        fields = self.get_fields(fields)
 
         if order_by not in ['username', 'email', 'first_name', 'last_name']:
             log.error(f'Can not order users by {order_by}')
@@ -38,15 +44,41 @@ class UsersHandler(base.Base):
         if order_by in ['email', 'first_name', 'last_name']:
             order_by = f'user__{order_by}'
 
-        _users = await models.AuthUser.all().order_by(order_by).limit(limit).offset(offset)
-        _users = [await _u.serialize() for _u in _users]
-        _total = await models.AuthUser.all().count()
+        _filters = {'id__in': ids_users_csv.split(',')} if ids_users_csv else None
+        if _filters:
+            _users = await models.AuthUser.filter(**_filters).order_by(order_by).limit(limit).offset(offset)
+        else:
+            _users = await models.AuthUser.all().order_by(order_by).limit(limit).offset(offset)
+        _users_ids = [str(u.id) for u in _users]
+        _users = [await _u.serialize(fields=fields) for _u in _users]
+        if _filters:
+            _total = await models.AuthUser.filter(**_filters).count()
+        else:
+            _total = await models.AuthUser.all().count()
         _max_pages, _current_page = base.common.get_pages_counts(_total, limit, offset)
 
         _scopes = scopes_names_list[:]
         _scopes.sort()
         _roles = roles_names_list[:]
         _roles.sort()
+
+        if _users_ids and len(_users) > 0 and 'profile_image' in _users[0] and 'id' in _users[0]:
+            attachments, res = await get_documents_for_an_instance(self.request, 'user', ids_instances=_users_ids)
+            if attachments and 'documents' in attachments:
+                images_by_user_id = {}
+                for a in attachments['documents']:
+                    if 'id_instance' in a and str(a['id_instance']) in _users_ids:
+                        _id_user = a['id_instance']
+                        if _id_user not in images_by_user_id:
+                            images_by_user_id[_id_user] = []
+                        images_by_user_id[_id_user].append(a)
+
+                for i in images_by_user_id:
+                    images_by_user_id[i].sort(key=lambda _a: _a['created'], reverse=True)
+
+                for _user in _users:
+                    if _user['id'] in images_by_user_id:
+                        _user['profile_image'] = images_by_user_id[_user['id']][0]      # only the last attached image # todo: this has to be fixed
 
         return {'users': _users,
                 'summary': {'max_pages': _max_pages, 'current_page': _current_page, 'total_items': _total},
@@ -59,15 +91,18 @@ class UserHandler(base.Base, UserBaseHandler):
     User API
     """
 
-    @base.auth(permissions=ADMINISTRATORS)
+    @base.auth()
     @base.api()
-    async def get(self, user: (models.AuthUser, 'id')):
+    async def get(self, user: (models.AuthUser, 'id'), fields: list = None):
         """
         Get the user
         :param user: AuthUser object - user to retrieve
+        :param fields: list - fields of a user object to send in the response
         :return: user's data
         """
-        _users_data = await user.serialize()
+
+        fields = self.get_fields(fields)
+        _users_data = await user.serialize(fields=fields)
         return _users_data
 
     @base.auth(permissions=ADMINISTRATORS)

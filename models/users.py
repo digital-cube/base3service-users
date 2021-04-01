@@ -2,6 +2,7 @@ from tortoise.models import Model
 from tortoise import fields
 
 import base
+
 from lookup.user_roles import USER, get_names
 
 
@@ -40,9 +41,27 @@ class AuthUser(Model):
     user: fields.ReverseRelation['User']
     sessions: fields.ReverseRelation['Session']
 
-    async def serialize(self, all_data=False):
+    async def serialize(self, all_data=False, fields=None):
 
         await self.fetch_related('user', 'tenant')
+
+        if fields:
+            _data = {}
+            if 'id' in fields:
+                _data['id'] = str(self.id)
+            if 'username' in fields:
+                _data['username'] = str(self.username)
+            if 'first_name' in fields:
+                _data['first_name'] = self.user.first_name if self.user else None
+            if 'last_name' in fields:
+                _data['last_name'] = self.user.last_name if self.user else None
+            if 'display_name' in fields:
+                _data['display_name'] = await self.user.get_display_name() if self.user else None
+            if 'profile_image' in fields:
+                _data['profile_image'] = None
+
+            return _data
+
         _data = {
             'id': str(self.id),
             'username': self.username,
@@ -58,7 +77,8 @@ class AuthUser(Model):
             'roles': get_names(self.role_flags),
             'scopes': self.scopes,
             'tenant': self.tenant.serialize() if self.tenant else None,
-            'data': self.user.data
+            'data': self.user.data,
+            'profile_image': None
         }
 
         if all_data:
