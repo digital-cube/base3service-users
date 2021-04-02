@@ -6,8 +6,14 @@ from tortoise.transactions import in_transaction
 import base
 import models
 from common.utils import password_match, set_user_session_to_store
+from shared.src.ipc_helpers.documents import get_documents_for_instance_and_id_instance
 
 log = getLogger('base')
+
+
+class DummyRequest:
+    def __init__(self):
+        self.headers = {base.config.conf['authorization']['key']: None}
 
 
 @base.route(URI="/session")
@@ -55,12 +61,24 @@ class UsersLoginHandler(base.Base):
             await set_user_session_to_store(_user_data, _session)
 
         token = await _session.token
+        dummy_request = DummyRequest()
+        dummy_request.headers[base.config.conf['authorization']['key']] = token
+        profile_image = await self.get_profile_image(user.id, dummy_request)
 
-        return {'id': str(user.id), 
+        return {'id': str(user.id),
                 'token': token,
-                'profile_image': 'digital-cube-logo.png'
+                'profile_image': profile_image
                 
                 }, base.http.status.CREATED
+
+    async def get_profile_image(self, id_user, request):
+        attachments, res = await get_documents_for_instance_and_id_instance(request, 'user',
+                                                                            id_instance=str(id_user))
+        # print('ATTACHMETNS', attachments, res)
+        if 'documents' in attachments and len(attachments['documents']) > 0:
+            attachments['documents'].sort(key=lambda d: d['created'], reverse=True)
+            return attachments['documents'][0]
+        return None
 
     @base.auth()
     @base.api()
@@ -73,8 +91,7 @@ class UsersLoginHandler(base.Base):
         user = await models.users.AuthUser.get_or_none(id=self.id_user)
         if user:
             user_data = await user.serialize()
-            
-            user_data['profile_image'] = 'digital-cube-logo.png'
+            user_data['profile_image'] = await self.get_profile_image(user.id, self.request)
             
             return user_data
         raise base.http.HttpErrorUnauthorized
