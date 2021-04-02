@@ -29,7 +29,8 @@ class TestTenants(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_add_tenant(self):
+    @patch('api.users_login.UsersLoginHandler.get_profile_image', return_value=None)
+    def test_add_tenant(self, *_):
         self.register_user('user', '123', role_flags=SUPERUSER)
 
         _data = {
@@ -82,7 +83,8 @@ class TestTenants(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_edit_tenant(self):
+    @patch('api.users_login.UsersLoginHandler.get_profile_image', return_value=None)
+    def test_edit_tenant(self, *_):
         self.register_user('user', '123', role_flags=SUPERUSER)
         _token = self.last_result['token']
         self.add_tenant()
@@ -103,7 +105,8 @@ class TestTenants(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_add_user_to_tenant(self):
+    @patch('api.users_login.UsersLoginHandler.get_profile_image', return_value=None)
+    def test_add_user_to_tenant(self, *_):
         self.register_user('user', '123', role_flags=SUPERUSER)
         _token = self.last_result['token']
         _id_superuser = self.last_result['id']

@@ -38,7 +38,7 @@ class TestRegisterUsers(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def __TODO___test_register_user_with_minimum_data(self):
+    def test_register_user_with_minimum_data(self):
         _data = {
             'user': {
                 'username': 'user',
@@ -63,10 +63,12 @@ class TestRegisterUsers(BaseUserTest):
                 'notification_type': EMAIL,
                 'alarm_type': ALARM1,
                 'phone': '+33333333333',
+                'language': 'en'
             }
         }
         self.api(None, 'POST', self.prefix+'/register', body=_data, expected_code=http.HTTPStatus.CREATED, expected_result_contain_keys=['id', 'token'])
         # self.show_last_result()
+        # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
     def test_register_user_with_the_same_username(self):

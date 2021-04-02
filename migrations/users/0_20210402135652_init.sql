@@ -44,5 +44,6 @@ CREATE TABLE IF NOT EXISTS "users" (
     "notification_type" INT NOT NULL  DEFAULT 0,
     "phone" VARCHAR(64),
     "data" JSONB,
+    "language" VARCHAR(16) NOT NULL  DEFAULT 'en',
     "id_auth_user" UUID NOT NULL UNIQUE REFERENCES "auth_users" ("id") ON DELETE CASCADE
 );

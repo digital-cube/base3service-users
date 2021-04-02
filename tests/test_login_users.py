@@ -13,7 +13,8 @@ from lookup.notification_type import EMAIL
 class TestLoginUsers(BaseUserTest):
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_login_user(self):
+    @patch('api.users_login.UsersLoginHandler.get_profile_image', return_value=None)
+    def test_login_user(self, *_):
         self.register_user('user', '123')
 
         _data = {
@@ -60,7 +61,8 @@ class TestLoginUsers(BaseUserTest):
         # self.show_last_result()
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_check_users_session(self):
+    @patch('api.users_login.UsersLoginHandler.get_profile_image', return_value=None)
+    def test_check_users_session(self, *_):
         self.register_user('user', '123')
         self.assertIn('token', self.last_result, 'Session token is present')
         self.api(self.last_result['token'], 'GET', self.prefix+'/session', expected_code=http.HTTPStatus.OK,

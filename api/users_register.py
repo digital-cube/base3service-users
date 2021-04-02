@@ -6,6 +6,8 @@ import base
 import models
 from common.utils import format_password
 from common.utils import set_user_session_to_store
+from lookup.languages import EN
+from lookup.languages import languages_list
 
 log = getLogger('base')
 
@@ -54,6 +56,8 @@ class UsersRegisterHandler(base.Base):
 
             if user_data is not None:
                 user_data.auth_user = user
+                if user_data.language not in languages_list:
+                    user_data.language = EN
                 await user_data.save()
 
             _session = models.session.Session(user=user)

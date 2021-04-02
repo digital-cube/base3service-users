@@ -3,6 +3,7 @@ from tortoise import fields
 
 import base
 
+from lookup.languages import EN
 from lookup.user_roles import USER, get_names
 
 
@@ -77,8 +78,9 @@ class AuthUser(Model):
             'roles': get_names(self.role_flags),
             'scopes': self.scopes,
             'tenant': self.tenant.serialize() if self.tenant else None,
-            'data': self.user.data,
-            'profile_image': None
+            'data': self.user.data if self.user else None,
+            'profile_image': None,
+            'language': self.user.language if self.user else EN
         }
 
         if all_data:
@@ -103,6 +105,7 @@ class User(Model):
     notification_type = fields.IntField(default=0)
     phone = fields.CharField(max_length=64, null=True)
     data = fields.JSONField(null=True)
+    language = fields.CharField(max_length=16, null=False, default=EN)
 
     async def get_display_name(self):
 

@@ -36,6 +36,9 @@ class UsersHandler(base.Base, UserBaseHandler):
         :return: list of users
         """
 
+        if not self.user or 'role_flags' not in self.user:
+            return {'message': 'unauthorized'}, base.http.status.UNAUTHORIZED
+
         fields = self.get_fields(fields)
 
         if order_by not in ['username', 'email', 'first_name', 'last_name']:
@@ -100,6 +103,9 @@ class UserHandler(base.Base, UserBaseHandler):
         :param fields: list - fields of a user object to send in the response
         :return: user's data
         """
+
+        if not self.user or 'role_flags' not in self.user:
+            return {'message': 'unauthorized'}, base.http.status.UNAUTHORIZED
 
         fields = self.get_fields(fields)
         _users_data = await user.serialize(fields=fields)

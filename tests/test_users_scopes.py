@@ -36,7 +36,8 @@ class TestUsersScopes(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_add_scopes_to_users(self):
+    @patch('api.users_login.UsersLoginHandler.get_profile_image', return_value=None)
+    def test_add_scopes_to_users(self, *_):
         self.register_user('admin', '123', role_flags=ADMIN)
         _admin_token = self.last_result['token']
         _admin_id = self.last_result['id']
@@ -64,7 +65,8 @@ class TestUsersScopes(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_edit_scopes_for_users(self):
+    @patch('api.users_login.UsersLoginHandler.get_profile_image', return_value=None)
+    def test_edit_scopes_for_users(self, *_):
         self.register_user('admin', '123', role_flags=ADMIN)
         _admin_token = self.last_result['token']
         _admin_id = self.last_result['id']
@@ -94,7 +96,8 @@ class TestUsersScopes(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_remove_scopes_for_users(self):
+    @patch('api.users_login.UsersLoginHandler.get_profile_image', return_value=None)
+    def test_remove_scopes_for_users(self, *_):
         self.register_user('admin', '123', role_flags=ADMIN)
         _admin_token = self.last_result['token']
         _admin_id = self.last_result['id']

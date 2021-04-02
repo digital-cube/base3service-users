@@ -14,14 +14,14 @@ from lookup.user_roles import DEVELOPER
 class TestUsers(BaseUserTest):
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    @patch('base.src.base.token.token2user', token2user)
+    @patch('api.users.get_documents_for_an_instance', return_value=([], None))
     def test_get_users_unauthorized(self, *_):
-        self.api(None, 'GET', f'{self.prefix}', expected_code=http.HTTPStatus.UNAUTHORIZED,
-                 expected_result_contain_keys=['message'])
+        with patch('base.src.base.token.token2user', return_value=None):
+            self.api(None, 'GET', f'{self.prefix}', expected_code=http.HTTPStatus.UNAUTHORIZED,
+                     expected_result_contain_keys=['message'])
 
         self.register_user('user', '123')
-        self.api(self.last_result['token'], 'GET', f'{self.prefix}', expected_code=http.HTTPStatus.UNAUTHORIZED,
-                 expected_result_contain_keys=['message'])
+        self.api(self.last_result['token'], 'GET', f'{self.prefix}', expected_code=http.HTTPStatus.OK)
 
         # self.show_last_result()
         # self.flush_db_at_the_end = False
@@ -61,7 +61,8 @@ class TestUsers(BaseUserTest):
         self.add_users()
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_get_users(self):
+    @patch('api.users.get_documents_for_an_instance', return_value=([], None))
+    def test_get_users(self, *_):
         self.add_users()
 
         self.api(self.admins[self.admins_ids[0]], 'GET', self.prefix, expected_code=http.HTTPStatus.OK,
@@ -91,7 +92,8 @@ class TestUsers(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())        # has to be patched not to use redis without the config
-    def test_get_users_with_order(self):
+    @patch('api.users.get_documents_for_an_instance', return_value=([], None))
+    def test_get_users_with_order(self, *_):
         self.add_users()
 
         _params = urllib.parse.urlencode({
@@ -144,12 +146,17 @@ class TestUser(BaseUserTest):
 
     @patch('base.store.Store.engine', store.DictStore())  # has to be patched not to use redis without the config
     @patch('base.src.base.token.token2user', token2user)
+    @patch('api.users.get_documents_for_an_instance', return_value=([], None))
     def test_get_user_unauthorized(self, *_):
-        self.api(None, 'GET', f'{self.prefix}/1', expected_code=http.HTTPStatus.UNAUTHORIZED,
-                 expected_result_contain_keys=['message'])
+        with patch('base.src.base.token.token2user', return_value=None):
+            self.api(None, 'GET', f'{self.prefix}/1', expected_code=http.HTTPStatus.UNAUTHORIZED,
+                     expected_result_contain_keys=['message'])
         self.register_user('user', '123')
-        self.api(self.last_result['token'], 'GET', f'{self.prefix}/1', expected_code=http.HTTPStatus.UNAUTHORIZED,
+        _id = self.last_result['id']
+
+        self.api('x', 'GET', f'{self.prefix}/00000000-0000-0000-0000-000000000000', expected_code=http.HTTPStatus.NOT_FOUND,
                  expected_result_contain_keys=['message'])
+        self.api('x', 'GET', f'{self.prefix}/{_id}', expected_code=http.HTTPStatus.OK)
         # self.show_last_result()
         # self.flush_db_at_the_end = False
 
@@ -167,7 +174,8 @@ class TestUser(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())  # has to be patched not to use redis without the config
-    def test_edit_user_data(self):
+    @patch('api.users.get_documents_for_an_instance', return_value=([], None))
+    def test_edit_user_data(self, *_):
         self.register_user('user', '123')
         _user_id = self.last_result['id']
         self.register_user('admin', '123', role_flags=ADMIN)
@@ -208,7 +216,9 @@ class TestUser(BaseUserTest):
         # self.flush_db_at_the_end = False
 
     @patch('base.store.Store.engine', store.DictStore())  # has to be patched not to use redis without the config
-    def test_edit_user_username_and_password(self):
+    @patch('api.users.get_documents_for_an_instance', return_value=([], None))
+    @patch('api.users_login.UsersLoginHandler.get_profile_image', return_value=None)
+    def test_edit_user_username_and_password(self, *_):
         self.register_user('user', '123')
         _user_id = self.last_result['id']
         self.register_user('admin', '123', role_flags=ADMIN)

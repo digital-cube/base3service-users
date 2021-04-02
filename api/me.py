@@ -7,6 +7,7 @@ from common.components import UserBaseHandler
 from common.utils import format_password, password_match
 import lookup.alarm_types as alarm_types
 import lookup.notification_type as notification_types
+from lookup.languages import languages_list
 
 log = getLogger('base')
 
@@ -21,7 +22,7 @@ class MeHandler(base.Base, UserBaseHandler):
     @base.api()
     async def patch(self, first_name: str = None, last_name: str = None, email: str = None,
                     alarm_type: int = None, notification_type: int = None, phone_number: str = None,
-                    active: bool = None, last_used_application: str = None):
+                    active: bool = None, last_used_application: str = None, language: str = None):
         """
         Edit user's data
         :param first_name: user's first name
@@ -84,6 +85,14 @@ class MeHandler(base.Base, UserBaseHandler):
                 _user_data['last_used_application'] = last_used_application
                 user_data.data = _user_data
                 _changes.append('last_used_application')
+
+        if language is not None:
+            if language in languages_list:
+                if user_data.language != language:
+                    user_data.language = language
+                    _changes.append('language')
+            else:
+                log.error(f'Language {language} is unknown')
 
         if _changes:
             await user_data.save()
