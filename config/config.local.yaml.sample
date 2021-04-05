@@ -29,9 +29,9 @@ db: &db                           # Database to be used by the application
   type: 'postgres'                # Currently supported: 'postgres'
   port: 5432                      # Database port
   host: 'localhost'               # Database host
-  user: 'inventory'               # Database username
-  password: '123'                 # Database password
-  database: 'inventorydb'         # Database name
+  user: '__YOUR_DB_USER__'               # Database username
+  password: '__YOUR_DB_PASSWORD__'                 # Database password
+  database: '__YOUR_DB_NAME__'         # Database name
 
 tortoise:                         # tortoise ORM configuration
   connections:
