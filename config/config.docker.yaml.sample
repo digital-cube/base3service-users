@@ -28,7 +28,8 @@ APIs:                             # APIs
 db: &db                           # Database to be used by the application
   type: 'postgres'                # Currently supported: 'postgres'
   port: 5432                      # Database port
-  host: 'postgres'                # Database host
+  # host: 'postgres'                # Database host
+  host: $POSTGRES_HOST            # Database host
   user: 'inventory'               # Database username
   password: '123'                 # Database password
   database: 'inventory_users'     # Database name
